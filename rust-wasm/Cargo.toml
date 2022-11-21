@@ -40,7 +40,6 @@ features = [
 ]
 default-features = false
 git =  "https://github.com/gitkwr/polars"
-version = "0.25.1"
 
 
 

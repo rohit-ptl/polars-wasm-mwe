@@ -1,0 +1,12 @@
+{
+  "name": "rust-wasm",
+  "version": "0.1.0",
+  "files": [
+    "rust_wasm_bg.wasm",
+    "rust_wasm.js",
+    "rust_wasm.d.ts"
+  ],
+  "module": "rust_wasm.js",
+  "types": "rust_wasm.d.ts",
+  "sideEffects": false
+}
