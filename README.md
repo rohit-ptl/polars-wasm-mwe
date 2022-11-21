@@ -1,10 +1,12 @@
-in the rust-wasm folder, run the following command:
-` wasm-pack build --target web`
+In the rust-wasm folder, run the following command:
+`wasm-pack build --target web`
 
-This will create a pkg folder with the compiled wasm file and a js file that will be used to import the wasm file into the html file.
+This will create a pkg folder with the compiled Wasm file and a js file that will be used to import the wasm file into the html file.
 
-in the root dir
+In the root directory we run 
+`python server.py` 
+to start a http server to host the index.html file.
 
-run `python server.py`
+This will start a server with the right CORS settings to have the shared array buffer working.
 
-and go to localhost:8000 in your browser
+Go to localhost:8000 in your browser. Localhost is important here otherwise there will be some issues with the wasm.
