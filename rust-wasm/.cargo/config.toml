@@ -1,0 +1,9 @@
+# set a bunch of flags needed to have wasm-bindgen-rayon working
+[target.wasm32-unknown-unknown]
+rustflags = ["-C", "target-feature=+atomics,+bulk-memory,+mutable-globals", "-C", "link-arg=--max-memory=4294967296"]
+
+[unstable]
+build-std = ["panic_abort", "std"]
+
+[build]
+target = "wasm32-unknown-unknown"
