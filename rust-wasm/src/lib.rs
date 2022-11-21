@@ -28,12 +28,14 @@ pub fn process_file(buffer: &[u8]) -> String {
 
     output.push_str("TOP 10 ROWS\n\n");
 
-    for (header, dtype) in (columns.iter().zip(dtypes.iter())) {
+    for (header, dtype) in columns.iter().zip(dtypes.iter()) {
         output.push_str(&header);
         output.push_str(": ");
         output.push_str(&dtype.to_string());
         output.push_str(",");
     }
+
+    output.push_str("\r\n");
     for i in 0..10 {
         let row = dataframe.get_row(i);
 
