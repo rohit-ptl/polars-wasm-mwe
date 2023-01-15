@@ -1,2 +1,5 @@
 /target
 /Cargo.lock
+venv
+.venv
+*.wasm

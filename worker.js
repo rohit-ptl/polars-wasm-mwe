@@ -9,14 +9,9 @@ async function start() {
 
 
 onmessage = async function (e) {
-    // receive the file from the main thread
-    var file = e.data;
-    console.log(file);
-    let buffer = await e.data.arrayBuffer()
-    console.log(buffer);
-    let arr = new Uint8Array(buffer)
-
-    let out = rustWasm.process_file(arr)
+    var data = JSON.parse(e.data);
+    console.log(data);
+    let out = rustWasm.process_file(Object.values(data.file), data.learningRate, data.lambda, data.numIter, data.regType);
     this.postMessage(out)
 }
 

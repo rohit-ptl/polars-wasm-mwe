@@ -72,14 +72,18 @@ function getInt32Memory0() {
 }
 /**
 * @param {Uint8Array} buffer
+* @param {number} learning_rate
+* @param {number} lambda
+* @param {number} max_iter
+* @param {number} int_regularisation
 * @returns {string}
 */
-export function process_file(buffer) {
+export function process_file(buffer, learning_rate, lambda, max_iter, int_regularisation) {
     try {
         const retptr = wasm.__wbindgen_add_to_stack_pointer(-16);
         const ptr0 = passArray8ToWasm0(buffer, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
-        wasm.process_file(retptr, ptr0, len0);
+        wasm.process_file(retptr, ptr0, len0, learning_rate, lambda, max_iter, int_regularisation);
         var r0 = getInt32Memory0()[retptr / 4 + 0];
         var r1 = getInt32Memory0()[retptr / 4 + 1];
         return getStringFromWasm0(r0, r1);
