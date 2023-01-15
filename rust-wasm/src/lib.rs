@@ -6,7 +6,8 @@ use std::{io::Cursor, panic};
 pub use wasm_bindgen_rayon::init_thread_pool;
 use wasm_bindgen::prelude::*;
 use wasm_logger;
-use ndarray::{Array1, Array2, s};
+use ndarray::{Array1, Array2, s, concatenate};
+
 
 fn l2_norm(array: Array1<f64>) -> f64 {
     array.dot(&array)
@@ -16,8 +17,24 @@ fn logistic_regression(
     X: &Array2<f64>, 
     beta: &Array1<f64>
     ) -> Array1<f64> {
-    let z = X.dot(beta);
-    z.mapv(|x| 1.0 / (1.0 + (-x).exp()))
+    
+    if X.shape()[1] < beta.shape()[0] {
+        // Add an additional column to X to act as the bias parameter
+        let new_col = Array1::<f64>::ones(X.shape()[0]);
+        let mut X = X.clone();
+        X.push_column(new_col.view());
+        let z = X.dot(beta);
+        return z.mapv(|x| 1.0 / (1.0 + (-x).exp()))       
+    } else {
+        let z = X.dot(beta);
+        z.mapv(|x| 1.0 / (1.0 + (-x).exp()))
+    }
+}
+
+#[derive(Clone, Copy)]
+enum RegularisationOptions {
+    L1,
+    L2
 }
 
 fn logistic_regression_parameter_optimisation(
@@ -25,17 +42,39 @@ fn logistic_regression_parameter_optimisation(
     y: &Array1<f64>, 
     max_iter: usize, 
     tol: f64, 
-    learning_rate: f64
+    learning_rate: f64,
+    regularisation: Option<RegularisationOptions>,
+    lambda: Option<f64>
     ) -> Array1<f64> {
 
     // Initialise weights to zero, with them being the same size as the nubmer of input features
-    let mut beta = Array1::zeros(X.shape()[1]);
+    // plus an extra (bias)
+    let mut beta = Array1::zeros(X.shape()[1] + 1);
 
+    // Add an additional column to X to act as the bias parameter
+    let new_col = Array1::<f64>::ones(X.shape()[0]);
+    let mut X = X.clone();
+    X.push_column(new_col.view());
+    
     for _ in 0..max_iter {
         let w = logistic_regression(&X, &beta);
 
         // Calculate the gradient of the weights with respect to the loss function
         let gradient = &X.t().dot(&(w - y));
+
+        let gradient = match regularisation {
+            Some(reg) => {
+               match reg {
+                   RegularisationOptions::L1 => {
+                       gradient + lambda.unwrap() * beta.mapv(|x| x.signum())
+                   }, 
+                   RegularisationOptions::L2 => {
+                       gradient + lambda.unwrap() * &beta
+                   }
+                }
+            },
+            None => gradient.clone() 
+        };
 
         // Perform the gradient step
         let beta_new = &beta - learning_rate * gradient;
@@ -98,10 +137,13 @@ pub fn process_file(buffer: &[u8]) -> String {
     let max_iter = 1000;
     let tol = 0.01;
     let learning_rate = 0.1;
+    let regularisation = Some(RegularisationOptions::L1);
+    let lambda = Some(0.01);
 
-    let beta = logistic_regression_parameter_optimisation(&X, &y_true, max_iter, tol, learning_rate);
+    let beta = logistic_regression_parameter_optimisation(&X, &y_true, max_iter, tol, learning_rate, regularisation, lambda);
 
     let y_pred = logistic_regression(&X, &beta);
+    log::debug!("THe predictions are {:?}", y_pred);
 
     let accuracy = accuracy(&y_pred, &y_true);
 

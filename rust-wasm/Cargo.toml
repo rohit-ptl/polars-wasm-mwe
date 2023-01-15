@@ -20,6 +20,7 @@ js-sys = "*"
 rayon = "1.5"
 wasm-bindgen-rayon = { version = "1.0", features = ["no-bundler"] }
 ndarray = "*"
+ndarray-inverse = "*"
 
 [dev-dependencies]
 wasm-bindgen-test = "0.3.0"
